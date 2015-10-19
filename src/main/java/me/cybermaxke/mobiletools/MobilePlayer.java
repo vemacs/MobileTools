@@ -307,9 +307,22 @@ public class MobilePlayer {
 		}
 	}
 
-	public class EntityFurnace extends TileEntityFurnace {
+	private static Field furnaceField;
 
+	public class EntityFurnace extends TileEntityFurnace {
 		public EntityFurnace(EntityHuman entity) {
+			if (furnaceField == null) {
+				try {
+					furnaceField = CraftFurnace.class.getDeclaredField("furnace");
+					furnaceField.setAccessible(true);
+
+					Field mfield = Field.class.getDeclaredField("modifiers");
+					mfield.setAccessible(true);
+					mfield.set(furnaceField, furnaceField.getModifiers() & ~Modifier.FINAL);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 			this.world = entity.world;
 		}
 
@@ -336,23 +349,11 @@ public class MobilePlayer {
 		@Override
 		public InventoryHolder getOwner() {
 			Furnace furnace = new CraftFurnace(this.world.getWorld().getBlockAt(0, 0, 0));
-
-			/**
-			 * Setting the tile we will use, this is the only good way!
-			 */
 			try {
-				Field field = CraftFurnace.class.getDeclaredField("furnace");
-				field.setAccessible(true);
-
-				Field mfield = Field.class.getDeclaredField("modifiers");
-				mfield.setAccessible(true);
-				mfield.set(field, field.getModifiers() & ~Modifier.FINAL);
-
-				field.set(furnace, this);
-			} catch (Exception e) {
+				furnaceField.set(furnace, this);
+			} catch (IllegalAccessException e) {
 				e.printStackTrace();
 			}
-
 			return furnace;
 		}
 	}
