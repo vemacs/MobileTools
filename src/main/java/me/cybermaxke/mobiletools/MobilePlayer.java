@@ -257,10 +257,24 @@ public class MobilePlayer {
 		}
 	}
 
+	private static Field brewingStandField;
+
 	public class EntityBrewingStand extends TileEntityBrewingStand {
 
 		public EntityBrewingStand(EntityHuman entity) {
 			this.world = entity.world;
+			if (brewingStandField == null) {
+				try {
+					brewingStandField = CraftBrewingStand.class.getDeclaredField("brewingStand");
+					brewingStandField.setAccessible(true);
+
+					Field mfield = Field.class.getDeclaredField("modifiers");
+					mfield.setAccessible(true);
+					mfield.set(brewingStandField, brewingStandField.getModifiers() & ~Modifier.FINAL);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
 		@Override
@@ -286,23 +300,11 @@ public class MobilePlayer {
 		@Override
 		public InventoryHolder getOwner() {
 			BrewingStand brew = new CraftBrewingStand(this.world.getWorld().getBlockAt(0, 0, 0));
-
-			/**
-			 * Setting the tile we will use, this is the only good way!
-			 */
 			try {
-				Field field = CraftBrewingStand.class.getDeclaredField("brewingStand");
-				field.setAccessible(true);
-
-				Field mfield = Field.class.getDeclaredField("modifiers");
-				mfield.setAccessible(true);
-				mfield.set(field, field.getModifiers() & ~Modifier.FINAL);
-
-				field.set(brew, this);
-			} catch (Exception e) {
+				brewingStandField.set(brew, this);
+			} catch (IllegalAccessException e) {
 				e.printStackTrace();
 			}
-
 			return brew;
 		}
 	}
