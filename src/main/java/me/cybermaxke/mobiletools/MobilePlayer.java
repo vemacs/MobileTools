@@ -106,7 +106,7 @@ public class MobilePlayer {
 		WorkbenchContainer container = new WorkbenchContainer(this.handle);
 
 		int c = this.handle.nextContainerCounter();
-		this.handle.playerConnection.sendPacket(new PacketPlayOutOpenWindow(c, "minecraft:workbench", new ChatMessage("Crafting", new Object[]{}), 0));
+		this.handle.playerConnection.sendPacket(new PacketPlayOutOpenWindow(c, "minecraft:workbench", new ChatMessage("Crafting"), 0));
 		this.handle.activeContainer = container;
 		this.handle.activeContainer.windowId = c;
 		this.handle.activeContainer.addSlotListener(this.handle);
@@ -116,7 +116,7 @@ public class MobilePlayer {
 		EnchantTableContainer container = new EnchantTableContainer(this.config, this.handle);
 
 		int c = this.handle.nextContainerCounter();
-		this.handle.playerConnection.sendPacket(new PacketPlayOutOpenWindow(c, "minecraft:enchantment_table", new ChatMessage("Enchanting", new Object[]{}), 0));
+		this.handle.playerConnection.sendPacket(new PacketPlayOutOpenWindow(c, "minecraft:enchantment_table", new ChatMessage("Enchanting"), 0));
 		this.handle.activeContainer = container;
 		this.handle.activeContainer.windowId = c;
 		this.handle.activeContainer.addSlotListener(this.handle);
@@ -126,7 +126,7 @@ public class MobilePlayer {
 		AnvilContainer container = new AnvilContainer(this.handle);
 
 		int c = this.handle.nextContainerCounter();
-		this.handle.playerConnection.sendPacket(new PacketPlayOutOpenWindow(c, "minecraft:anvil", new ChatMessage("Repairing", new Object[]{}), 0));
+		this.handle.playerConnection.sendPacket(new PacketPlayOutOpenWindow(c, "minecraft:anvil", new ChatMessage("Repairing"), 0));
 		this.handle.activeContainer = container;
 		this.handle.activeContainer.windowId = c;
 		this.handle.activeContainer.addSlotListener(this.handle);
