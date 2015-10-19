@@ -1,20 +1,20 @@
 /**
- * 
+ *
  * This software is part of the MobileTools
- * 
+ *
  * MobileTools is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or 
  * any later version.
- * 
+ *
  * MobileTools is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MobileTools. If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 package me.cybermaxke.mobiletools;
 
@@ -30,24 +30,25 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.craftbukkit.v1_8_R3.block.CraftBrewingStand;
+import org.bukkit.craftbukkit.v1_8_R3.block.CraftFurnace;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 
-import org.bukkit.craftbukkit.v1_7_R3.block.CraftBrewingStand;
-import org.bukkit.craftbukkit.v1_7_R3.block.CraftFurnace;
-import org.bukkit.craftbukkit.v1_7_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_7_R3.inventory.CraftItemStack;
-
-import net.minecraft.server.v1_7_R3.Block;
-import net.minecraft.server.v1_7_R3.Blocks;
-import net.minecraft.server.v1_7_R3.ContainerAnvil;
-import net.minecraft.server.v1_7_R3.ContainerEnchantTable;
-import net.minecraft.server.v1_7_R3.ContainerWorkbench;
-import net.minecraft.server.v1_7_R3.EntityHuman;
-import net.minecraft.server.v1_7_R3.EntityPlayer;
-import net.minecraft.server.v1_7_R3.IInventory;
-import net.minecraft.server.v1_7_R3.ItemStack;
-import net.minecraft.server.v1_7_R3.PacketPlayOutOpenWindow;
-import net.minecraft.server.v1_7_R3.TileEntityBrewingStand;
-import net.minecraft.server.v1_7_R3.TileEntityFurnace;
+import net.minecraft.server.v1_8_R3.Block;
+import net.minecraft.server.v1_8_R3.BlockPosition;
+import net.minecraft.server.v1_8_R3.Blocks;
+import net.minecraft.server.v1_8_R3.ChatMessage;
+import net.minecraft.server.v1_8_R3.ContainerAnvil;
+import net.minecraft.server.v1_8_R3.ContainerEnchantTable;
+import net.minecraft.server.v1_8_R3.ContainerWorkbench;
+import net.minecraft.server.v1_8_R3.EntityHuman;
+import net.minecraft.server.v1_8_R3.EntityPlayer;
+import net.minecraft.server.v1_8_R3.IInventory;
+import net.minecraft.server.v1_8_R3.ItemStack;
+import net.minecraft.server.v1_8_R3.PacketPlayOutOpenWindow;
+import net.minecraft.server.v1_8_R3.TileEntityBrewingStand;
+import net.minecraft.server.v1_8_R3.TileEntityFurnace;
 
 public class MobilePlayer {
 	private final MobilePlayerData data;
@@ -105,7 +106,7 @@ public class MobilePlayer {
 		WorkbenchContainer container = new WorkbenchContainer(this.handle);
 
 		int c = this.handle.nextContainerCounter();
-		this.handle.playerConnection.sendPacket(new PacketPlayOutOpenWindow(c, 1, "Crafting", 9, true));
+		this.handle.playerConnection.sendPacket(new PacketPlayOutOpenWindow(c, "minecraft:workbench", new ChatMessage("Crafting", new Object[]{}), 0));
 		this.handle.activeContainer = container;
 		this.handle.activeContainer.windowId = c;
 		this.handle.activeContainer.addSlotListener(this.handle);
@@ -113,9 +114,9 @@ public class MobilePlayer {
 
 	public void openEnchantingTable() {
 		EnchantTableContainer container = new EnchantTableContainer(this.config, this.handle);
-		
+
 		int c = this.handle.nextContainerCounter();
-		this.handle.playerConnection.sendPacket(new PacketPlayOutOpenWindow(c, 4, "Enchant", 9, true));
+		this.handle.playerConnection.sendPacket(new PacketPlayOutOpenWindow(c, "minecraft:enchantment_table", new ChatMessage("Enchanting", new Object[]{}), 0));
 		this.handle.activeContainer = container;
 		this.handle.activeContainer.windowId = c;
 		this.handle.activeContainer.addSlotListener(this.handle);
@@ -125,7 +126,7 @@ public class MobilePlayer {
 		AnvilContainer container = new AnvilContainer(this.handle);
 
 		int c = this.handle.nextContainerCounter();
-		this.handle.playerConnection.sendPacket(new PacketPlayOutOpenWindow(c, 8, "Repairing", 9, true));
+		this.handle.playerConnection.sendPacket(new PacketPlayOutOpenWindow(c, "minecraft:anvil", new ChatMessage("Repairing", new Object[]{}), 0));
 		this.handle.activeContainer = container;
 		this.handle.activeContainer.windowId = c;
 		this.handle.activeContainer.addSlotListener(this.handle);
@@ -161,11 +162,11 @@ public class MobilePlayer {
 	}
 
 	public void openFurnace() {
-		this.handle.openFurnace(this.furnace);
+		this.handle.openTileEntity(this.furnace);
 	}
 
 	public void openBrewingStand() {
-		this.handle.openBrewingStand(this.brewingStand);
+		this.handle.openTileEntity(this.brewingStand);
 	}
 
 	public void save() {
@@ -193,7 +194,7 @@ public class MobilePlayer {
 		private final Player player;
 
 		public EnchantTableContainer(MobileConfiguration config, EntityPlayer entity) {
-			super(entity.inventory, entity.world, 0, 0, 0);
+			super(entity.inventory, entity.world, new BlockPosition(0, 0, 0));
 			this.config = config;
 			this.player = entity.getBukkitEntity();
 		}
@@ -235,7 +236,7 @@ public class MobilePlayer {
 	public class WorkbenchContainer extends ContainerWorkbench {
 
 		public WorkbenchContainer(EntityHuman entity) {
-			super(entity.inventory, entity.world, 0, 0, 0);
+			super(entity.inventory, entity.world, new BlockPosition(0, 0, 0));
 		}
 
 		@Override
@@ -247,7 +248,7 @@ public class MobilePlayer {
 	public class AnvilContainer extends ContainerAnvil {
 
 		public AnvilContainer(EntityHuman entity) {
-			super(entity.inventory, entity.world, 0, 0, 0, entity);
+			super(entity.inventory, entity.world, new BlockPosition(0, 0, 0), entity);
 		}
 
 		@Override
@@ -268,7 +269,7 @@ public class MobilePlayer {
 		}
 
 		@Override
-		public int p() {
+		public int u() {
 			return 0;
 		}
 
@@ -278,7 +279,7 @@ public class MobilePlayer {
 		}
 
 		@Override
-		public Block q() {
+		public Block w() {
 			return Blocks.BREWING_STAND;
 		}
 
@@ -318,7 +319,7 @@ public class MobilePlayer {
 		}
 
 		@Override
-		public int p() {
+		public int u() {
 			return 0;
 		}
 
@@ -328,7 +329,7 @@ public class MobilePlayer {
 		}
 
 		@Override
-		public Block q() {
+		public Block w() {
 			return Blocks.FURNACE;
 		}
 

@@ -43,8 +43,8 @@ public class MobilePlayerTask extends BukkitRunnable {
 			MobilePlayer mp = this.plugin.getPlayer(player);
 
 			for (int i = 0; i < this.updateDelay; i++) {
-				mp.getBrewingStand().h();
-				mp.getFurnace().h();
+				mp.getBrewingStand().c();
+				mp.getFurnace().c();
 			}
 
 			if (this.updateTicks > (400 / this.updateDelay)) {
